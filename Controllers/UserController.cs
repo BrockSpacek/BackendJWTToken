@@ -25,6 +25,13 @@ namespace BackendJWTToken.Controllers
             return _userService.CreateUser(newUser);
         }
 
+        [HttpPost]
+        [Route("Login")]
+
+        public IActionResult Login([FromBody]UserDTO user){
+
+        }
+
         
     }
 }
