@@ -55,5 +55,35 @@ namespace BackendJWTToken.Services
 
             return hashedPassword;
         }
+
+        public string Login(UserDTO user){
+            string result = null;
+
+            UserModel foundUser = GetUserByEmail(user.Email);
+
+            if(foundUser == null){
+                return result;
+            }
+
+            if(VerifyPassword(user.Password, foundUser.Salt, foundUser.Hash)){
+                result = "token";
+                return result;
+            }
+        }
+
+        private UserModel GetUserByEmail(string email){
+            return _dataContext.Users.SingleOrDefault(user => user.Email == email);
+        }
+
+        private static bool VerifyPassword(string password, string salt, string hash){
+            byte[] saltBytes = Convert.FromBase64String(salt);
+
+            string newHash;
+            using (var deriveBytes = new Rfc2898DeriveBytes(password, saltBytes, 310000, HashAlgorithmName.SHA256)){
+                newHash = Convert.ToBase64String(deriveBytes.GetBytes(32));
+            }
+
+            return hash == newHash;
+        }
     }
 }

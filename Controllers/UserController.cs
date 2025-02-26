@@ -29,7 +29,13 @@ namespace BackendJWTToken.Controllers
         [Route("Login")]
 
         public IActionResult Login([FromBody]UserDTO user){
+            string stringToken = _userService.Login(user);
 
+            if(stringToken != null){
+                return Ok(new { Token = stringToken });
+            }else{
+                return Unauthorized(new { Message = "Login was unsuccessful. Invalid Email or Password"});
+            }
         }
 
         
