@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendJWTToken.Models;
 using BackendJWTToken.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendJWTToken.Controllers
@@ -36,6 +37,13 @@ namespace BackendJWTToken.Controllers
             }else{
                 return Unauthorized(new { Message = "Login was unsuccessful. Invalid Email or Password"});
             }
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("AuthenticUser")]
+        public string AuthenticUserCheck(){
+            return "You are logged in and allowed to be here, Yay!!";
         }
 
         

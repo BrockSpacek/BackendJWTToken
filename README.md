@@ -26,3 +26,22 @@ Database hosted on Azure
 Server Login Info: 
 username: BackendTokenDemo
 password: CodeStack123
+
+
+### CLI Commands for this project
+## API Setup
+- dotnet new webapi --use-controllers
+
+## EF Core installs
+- dotnet tool install --global dotnet-ef
+- dotnet add package Microsoft.EntityFrameworkCore -v 8
+- dotnet add package Microsoft.EntityFrameworkCore.SqlServer -v 8
+- dotnet add package Microsoft.EntityFrameworkCore.Tools -v 8
+
+## Database Migrations
+After setting up your database on Azure, establishing your connection string in your appsettings.json, and logging into the SQL Server extension, you will need your migrations files to have your API communicate with the database appropriately. This is generated and put to use with the following CLI commands. 
+- dotnet ef migrations add init
+- dotnet ef database update
+
+## JWT Bearer Token Authentication
+- dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 3

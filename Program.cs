@@ -1,7 +1,10 @@
+using System.Text;
 using BackendJWTToken.Context;
 using BackendJWTToken.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,44 @@ builder.Services.AddCors(options => {
 var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 
+
+
+var secretKey = builder.Configuration["Jwt:Key"] ?? "superSecretKey@345";
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        // This is setting up our authentication to know what to expect and check to see if our token is still valid
+        // These options are defining what is valid in our token as well, and should correlate to the options that we set upon generating our token
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        // This is a list of all the places a token should be allowed to get generated from
+        ValidIssuers = new[]
+        {
+            "http://localhost:5000"
+        },
+        // This is a list of all the places a token should be allowed to get used
+        ValidAudiences = new[]
+        {
+            "http://localhost:5000"
+        },
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) // Secret key
+    };
+});
+
+// Now that this is set up, you can make a call to an endpoint that is protected by [Authorize] by adding a "authorization header"
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -37,6 +78,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

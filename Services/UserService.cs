@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using BackendJWTToken.Context;
 using BackendJWTToken.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BackendJWTToken.Services
 {
@@ -66,9 +70,43 @@ namespace BackendJWTToken.Services
             }
 
             if(VerifyPassword(user.Password, foundUser.Salt, foundUser.Hash)){
-                result = "token";
-                return result;
+                // JWT: JSON Web Token = a type of token used for authentication or transfering information. 
+                // Bearer Token: A token that grants access to a resource, such as an API. JWT can be used as a bearer token, but there are other types of tokens that can be used as a bearer token
+                
+                // Setting the string that will be encrypted into our JWT
+                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
+
+                // Now to encrypt our secret key
+                var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+
+                // Set the options for our token to define properties such as where the token is issued from, where it is allowed to be used, and most importantly how long the token lasts before expiring.
+                var tokenOptions = new JwtSecurityToken(
+                    // issuer = where is this token allowed to be generated from
+                    issuer: "http://localhost:5000",
+                    // audience = where this token is allowed to authenticate
+                    // issuer and audience should be the same since our api is handling both login and authentication
+                    audience: "http://localhost:5000",
+                    // claims = additional options for authentication
+                    claims: new List<Claim>(),
+                    // Sets the token expiration time and date. In other words this is what makes our tokens temporary, thus keeping our access to our resources safe and secure
+                    expires: DateTime.Now.AddMinutes(30),
+                    // This attaches our newly encryted super secret key that was turned into sign in credentials
+                    signingCredentials: signinCredentials
+                );
+
+                // Generate our JWT and save the token as a string into a variable
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+                result = tokenString;
+
+                // Token Anatomy: 
+                // asldkfalsfs.asdgkasdg.asdgasdg
+                // Header = asldkfalsfs
+                // Payload = asdgkasdg this will have information about the token, including the expieration
+                // Signature = asdgasdg encrypt and combine header and payload using the secret key
             }
+
+            return result;
         }
 
         private UserModel GetUserByEmail(string email){
