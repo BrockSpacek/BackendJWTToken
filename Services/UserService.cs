@@ -82,10 +82,10 @@ namespace BackendJWTToken.Services
                 // Set the options for our token to define properties such as where the token is issued from, where it is allowed to be used, and most importantly how long the token lasts before expiring.
                 var tokenOptions = new JwtSecurityToken(
                     // issuer = where is this token allowed to be generated from
-                    issuer: "http://localhost:5000",
+                    issuer: "backendjwtapibs-dwdcf6hta0f3gdcs.westus-01.azurewebsites.net",
                     // audience = where this token is allowed to authenticate
                     // issuer and audience should be the same since our api is handling both login and authentication
-                    audience: "http://localhost:5000",
+                    audience: "backendjwtapibs-dwdcf6hta0f3gdcs.westus-01.azurewebsites.net",
                     // claims = additional options for authentication
                     claims: new List<Claim>(),
                     // Sets the token expiration time and date. In other words this is what makes our tokens temporary, thus keeping our access to our resources safe and secure
@@ -123,5 +123,24 @@ namespace BackendJWTToken.Services
 
             return hash == newHash;
         }
+
+        public bool UpdatePassword(UserDTO user){
+            bool result = false;
+
+            var foundUser = GetUserByEmail(user.Email);
+
+            if(foundUser == null){
+                return result;
+            }
+
+            PasswordDTO hashPassword = HashPassword(user.Password);
+
+            foundUser.Hash = hashPassword.Hash;
+            foundUser.Salt = hashPassword.Salt;
+
+            _dataContext.Update<UserModel>(foundUser);
+            result = _dataContext.SaveChanges() != 0
+            return result;
+;        }
     }
 }

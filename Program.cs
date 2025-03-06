@@ -50,12 +50,12 @@ builder.Services.AddAuthentication(options =>
         // This is a list of all the places a token should be allowed to get generated from
         ValidIssuers = new[]
         {
-            "http://localhost:5000"
+            "backendjwtapibs-dwdcf6hta0f3gdcs.westus-01.azurewebsites.net"
         },
         // This is a list of all the places a token should be allowed to get used
         ValidAudiences = new[]
         {
-            "http://localhost:5000"
+            "backendjwtapibs-dwdcf6hta0f3gdcs.westus-01.azurewebsites.net"
         },
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) // Secret key
     };

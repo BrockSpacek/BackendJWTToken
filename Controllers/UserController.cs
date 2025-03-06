@@ -46,6 +46,11 @@ namespace BackendJWTToken.Controllers
             return "You are logged in and allowed to be here, Yay!!";
         }
 
-        
+        [HttpPut]
+        [Route("UpdatePassword")]
+
+        public string UpdatePassword([FromBody] UserDTO user){
+            return _userService.UpdatePassword(user);
+        }
     }
 }
